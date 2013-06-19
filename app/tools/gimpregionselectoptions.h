@@ -40,6 +40,7 @@ struct _GimpRegionSelectOptions
   gboolean              select_transparent;
   gboolean              sample_merged;
   gdouble               threshold;
+  gboolean              continuous;
   GimpSelectCriterion   select_criterion;
 };
 

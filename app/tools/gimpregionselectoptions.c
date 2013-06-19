@@ -45,6 +45,7 @@ enum
   PROP_SELECT_TRANSPARENT,
   PROP_SAMPLE_MERGED,
   PROP_THRESHOLD,
+  PROP_CONTINUOUS, //continuous
   PROP_SELECT_CRITERION
 };
 
@@ -96,6 +97,12 @@ gimp_region_select_options_class_init (GimpRegionSelectOptionsClass *klass)
                                    N_("Maximum color difference"),
                                    0.0, 255.0, 15.0,
                                    GIMP_PARAM_STATIC_STRINGS);
+								   
+  GIMP_CONFIG_INSTALL_PROP_BOOLEAN (object_class, PROP_CONTINUOUS,
+                                    "continuous",
+                                    N_("Select only continuous region"),
+                                    FALSE,
+                                    GIMP_PARAM_STATIC_STRINGS);								   
 
   GIMP_CONFIG_INSTALL_PROP_ENUM (object_class, PROP_SELECT_CRITERION,
                                  "select-criterion",
@@ -131,6 +138,10 @@ gimp_region_select_options_set_property (GObject      *object,
     case PROP_THRESHOLD:
       options->threshold = g_value_get_double (value);
       break;
+	  
+    case PROP_CONTINUOUS:
+      options->continuous = g_value_get_boolean (value);
+      break;	  
 
     case PROP_SELECT_CRITERION:
       options->select_criterion = g_value_get_enum (value);
@@ -163,6 +174,10 @@ gimp_region_select_options_get_property (GObject    *object,
     case PROP_THRESHOLD:
       g_value_set_double (value, options->threshold);
       break;
+	  
+    case PROP_CONTINUOUS:
+      g_value_set_boolean (value, options->continuous);
+      break;	  
 
     case PROP_SELECT_CRITERION:
       g_value_set_enum (value, options->select_criterion);
@@ -216,6 +231,12 @@ gimp_region_select_options_gui (GimpToolOptions *tool_options)
                                     1.0, 16.0, 1);
   gtk_box_pack_start (GTK_BOX (vbox), scale, FALSE, FALSE, 0);
   gtk_widget_show (scale);
+  
+  /*  the continuous toggle  */
+  button = gimp_prop_check_button_new (config, "continuous",
+                                       _("Continuous"));
+  gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+  gtk_widget_show (button);  
 
   /*  the select criterion combo  */
   combo = gimp_prop_enum_combo_box_new (config, "select-criterion", 0, 0);
