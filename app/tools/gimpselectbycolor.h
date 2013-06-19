@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GIMP_SELECCT_BY_COLOR_TOOL_H__
-#define __GIMP_SELECCT_BY_COLOR_TOOL_H__
+#ifndef __GIMP_SELECT_BY_COLOR_TOOL_H__
+#define __GIMP_SELECT_BY_COLOR_TOOL_H__
 
 
 #include "gimpregionselecttool.h"

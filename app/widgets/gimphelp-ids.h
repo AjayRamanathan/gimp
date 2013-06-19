@@ -258,6 +258,7 @@
 #define GIMP_HELP_TOOL_BRIGHTNESS_CONTRAST        "gimp-tool-brightness-contrast"
 #define GIMP_HELP_TOOL_BUCKET_FILL                "gimp-tool-bucket-fill"
 #define GIMP_HELP_TOOL_BY_COLOR_SELECT            "gimp-tool-by-color-select"
+#define GIMP_HELP_TOOL_SELECT_BY_COLOR            "gimp-tool-select_by_color"
 #define GIMP_HELP_TOOL_CAGE                       "gimp-tool-cage"
 #define GIMP_HELP_TOOL_CLONE                      "gimp-tool-clone"
 #define GIMP_HELP_TOOL_COLORIZE                   "gimp-tool-colorize"
