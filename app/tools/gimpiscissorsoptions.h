@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #ifndef __GIMP_ISCISSORS_OPTIONS_H__
 #define __GIMP_ISCISSORS_OPTIONS_H__
 
@@ -47,3 +48,4 @@ GtkWidget * gimp_iscissors_options_gui      (GimpToolOptions *tool_options);
 
 
 #endif  /*  __GIMP_ISCISSORS_OPTIONS_H__  */
+

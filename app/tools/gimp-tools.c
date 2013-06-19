@@ -79,7 +79,7 @@
 #include "gimprectangleselecttool.h"
 #include "gimprotatetool.h"
 #include "gimpseamlessclonetool.h"
-#include "gimpselectbycolor.h"
+#include "gimpselectbycolortool.h"
 #include "gimpscaletool.h"
 #include "gimpsheartool.h"
 #include "gimpsmudgetool.h"
@@ -180,11 +180,13 @@ gimp_tools_init (Gimp *gimp)
     /*  selection tools */
 
     gimp_foreground_select_tool_register,
+    #if 0
     gimp_iscissors_tool_register,
+    #endif
     gimp_by_color_select_tool_register,
     gimp_fuzzy_select_tool_register,
     gimp_free_select_tool_register,
-    gimp_select_by_color_register,
+    gimp_select_by_color_tool_register,
     gimp_ellipse_select_tool_register,
     gimp_rectangle_select_tool_register
   };
