@@ -35,6 +35,9 @@
 
 #include "gimpregionselectoptions.h"
 #include "gimpregionselecttool.h"
+#include "gimpselectbycolortool.h"
+
+
 
 #include "gimp-intl.h"
 
@@ -212,6 +215,9 @@ gimp_region_select_options_gui (GimpToolOptions *tool_options)
   GtkWidget *button;
   GtkWidget *scale;
   GtkWidget *combo;
+  GType             tool_type;
+
+  tool_type = tool_options->tool_info->tool_type;
 
   /*  the select transparent areas toggle  */
   button = gimp_prop_check_button_new (config, "select-transparent",
@@ -231,18 +237,22 @@ gimp_region_select_options_gui (GimpToolOptions *tool_options)
                                     1.0, 16.0, 1);
   gtk_box_pack_start (GTK_BOX (vbox), scale, FALSE, FALSE, 0);
   gtk_widget_show (scale);
-  
-  /*  the continuous toggle  */
-  button = gimp_prop_check_button_new (config, "continuous",
-                                       _("Continuous"));
-  gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
-  gtk_widget_show (button);  
+ 
 
   /*  the select criterion combo  */
   combo = gimp_prop_enum_combo_box_new (config, "select-criterion", 0, 0);
   gimp_int_combo_box_set_label (GIMP_INT_COMBO_BOX (combo), _("Select by"));
   gtk_box_pack_start (GTK_BOX (vbox), combo, TRUE, TRUE, 0);
   gtk_widget_show (combo);
+
+    if (g_type_is_a (tool_type, GIMP_TYPE_SELECT_BY_COLOR_TOOL))
+   { 
+      /*  the continuous toggle  */
+      button = gimp_prop_check_button_new (config, "continuous",
+                                       _("Continuous"));
+      gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+      gtk_widget_show (button);  
+    }  
 
   return vbox;
 }
