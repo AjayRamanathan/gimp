@@ -17,6 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//Just for ease of purpose
+
+#if 0
+
 #ifndef __GIMP_SELECT_BY_COLOR_TOOL_H__
 #define __GIMP_SELECT_BY_COLOR_TOOL_H__
 
@@ -53,3 +57,5 @@ GType   gimp_select_by_color_tool_get_type (void) G_GNUC_CONST;
 
 
 #endif  /*  __GIMP_SELECT_BY_COLOR_TOOL_H__  */
+
+#endif

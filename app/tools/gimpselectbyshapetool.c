@@ -1,8 +1,6 @@
 /* GIMP - The GNU Image Manipulation Program
  * Copyright (C) 1995 Spencer Kimball and Peter Mattis
  *
- * gimpselectbycolortool.c
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
@@ -19,133 +17,120 @@
 
 #include "config.h"
 
-#include <string.h>
-
 #include <gegl.h>
 #include <gtk/gtk.h>
 
-#include "libgimpcolor/gimpcolor.h"
 #include "libgimpwidgets/gimpwidgets.h"
 
 #include "tools-types.h"
 
+#include "core/gimpchannel-select.h"
 #include "core/gimpimage.h"
-#include "core/gimpimage-contiguous-region.h"
-#include "core/gimpitem.h"
-#include "core/gimppickable.h"
 
 #include "widgets/gimphelp-ids.h"
 
 #include "display/gimpdisplay.h"
 
-#include "gimpselectbycolortool.h"
-#include "gimpregionselectoptions.h"
+#include "gimpselectbyshapetool.h"
+#include "gimprectangleselectoptions.h"
 #include "gimptoolcontrol.h"
 
 #include "gimp-intl.h"
 
 
-static GeglBuffer * gimp_select_by_color_tool_get_mask (GimpRegionSelectTool *region_select,
-                                                        GimpDisplay          *display);
+static void   gimp_select_by_shape_tool_draw   (GimpDrawTool            *draw_tool);
+
+static void   gimp_select_by_shape_tool_select (GimpRectangleSelectTool *rect_tool,
+                                               GimpChannelOps           operation,
+                                               gint                     x,
+                                               gint                     y,
+                                               gint                     w,
+                                               gint                     h);
 
 
-G_DEFINE_TYPE (GimpSelectByColorTool, gimp_select_by_color_tool,
-               GIMP_TYPE_REGION_SELECT_TOOL)
+G_DEFINE_TYPE (GimpSelectByShapeTool, gimp_select_by_shape_tool,
+               GIMP_TYPE_RECTANGLE_SELECT_TOOL)
 
-#define parent_class gimp_select_by_color_tool_parent_class
+#define parent_class gimp_select_by_shape_tool_parent_class
 
 
 void
-gimp_select_by_color_tool_register (GimpToolRegisterCallback  callback,
-                                    gpointer                  data)
+gimp_select_by_shape_tool_register (GimpToolRegisterCallback  callback,
+                                   gpointer                  data)
 {
-  (* callback) (GIMP_TYPE_SELECT_BY_COLOR_TOOL,
-                GIMP_TYPE_REGION_SELECT_OPTIONS,
-                gimp_region_select_options_gui,
+  (* callback) (GIMP_TYPE_SELECT_BY_SHAPE_TOOL,
+                GIMP_TYPE_RECTANGLE_SELECT_OPTIONS,
+                gimp_rectangle_select_options_gui,
                 0,
-                "gimp-select_by_color-tool",
-                _("Select by Color"),
-                _("Select by Color Tool: Select regions with similar colors; Both Over Continous and Closed Place"),
-                N_("_Select By Color"), "<shift>X",
-                NULL, GIMP_HELP_TOOL_SELECT_BY_COLOR,
-                GIMP_STOCK_TOOL_SELECT_BY_COLOR,
+                "gimp-select-by-shape-tool",
+                _("Select by Shape"),
+                _("Select by Shape Tool: Selects a predefined shape"),
+                N_("_Select By Shape"), "<shift>S",
+                NULL, GIMP_HELP_TOOL_SELECT_BY_SHAPE,
+                GIMP_STOCK_TOOL_SELECT_BY_SHAPE,
                 data);
 }
 
 static void
-gimp_select_by_color_tool_class_init (GimpSelectByColorToolClass *klass)
+gimp_select_by_shape_tool_class_init (GimpSelectByShapeToolClass *klass)
 {
-  GimpRegionSelectToolClass *region_class;
+  GimpDrawToolClass            *draw_tool_class = GIMP_DRAW_TOOL_CLASS (klass);
+  GimpRectangleSelectToolClass *rect_tool_class = GIMP_RECTANGLE_SELECT_TOOL_CLASS (klass);
 
-  region_class = GIMP_REGION_SELECT_TOOL_CLASS (klass);
+  draw_tool_class->draw   = gimp_select_by_shape_tool_draw;
 
-  region_class->undo_desc = C_("command", "Select by Color");
-  region_class->get_mask  = gimp_select_by_color_tool_get_mask;
+  rect_tool_class->select = gimp_select_by_shape_tool_select;
 }
 
 static void
-gimp_select_by_color_tool_init (GimpSelectByColorTool *select_by_color)
+gimp_select_by_shape_tool_init (GimpSelectByShapeTool *select_by_shape)
 {
-  GimpTool *tool = GIMP_TOOL (select_by_color);
+  GimpTool *tool = GIMP_TOOL (select_by_shape);
 
-  gimp_tool_control_set_tool_cursor (tool->control, GIMP_TOOL_CURSOR_HAND);
+  gimp_tool_control_set_tool_cursor (tool->control,
+                                     GIMP_TOOL_CURSOR_ELLIPSE_SELECT);
+  //Need to add new Cursors :'(
 }
 
-static GeglBuffer *
-gimp_select_by_color_tool_get_mask (GimpRegionSelectTool *region_select,
-                                    GimpDisplay          *display)
+static void
+gimp_select_by_shape_tool_draw (GimpDrawTool *draw_tool)
 {
-  GimpTool                *tool        = GIMP_TOOL (region_select);
-  GimpSelectionOptions    *sel_options = GIMP_SELECTION_TOOL_GET_OPTIONS (tool);
-  GimpRegionSelectOptions *options     = GIMP_REGION_SELECT_TOOL_GET_OPTIONS (tool);
-  GimpImage               *image       = gimp_display_get_image (display);
-  GimpDrawable            *drawable    = gimp_image_get_active_drawable (image);
-  GimpPickable            *pickable;
-  GimpRGB                  color;
-  gint                     x, y;
+  gint x1, y1, x2, y2;
 
-  x = region_select->x;
-  y = region_select->y;
+  GIMP_DRAW_TOOL_CLASS (parent_class)->draw (draw_tool);
 
-  if (! options->sample_merged)
-    {
-      gint off_x, off_y;
+  g_object_get (draw_tool,
+                "x1", &x1,
+                "y1", &y1,
+                "x2", &x2,
+                "y2", &y2,
+                NULL);
 
-      gimp_item_get_offset (GIMP_ITEM (drawable), &off_x, &off_y);
+  gimp_draw_tool_add_arc (draw_tool,
+                          FALSE,
+                          x1, y1,
+                          x2 - x1, y2 - y1,
+                          0.0, 2 * G_PI);
+}
 
-      x -= off_x;
-      y -= off_y;
+static void
+gimp_select_by_shape_tool_select (GimpRectangleSelectTool *rect_tool,
+                                 GimpChannelOps           operation,
+                                 gint                     x,
+                                 gint                     y,
+                                 gint                     w,
+                                 gint                     h)
+{
+  GimpTool             *tool    = GIMP_TOOL (rect_tool);
+  GimpSelectionOptions *options = GIMP_SELECTION_TOOL_GET_OPTIONS (rect_tool);
+  GimpImage            *image   = gimp_display_get_image (tool->display);
 
-      pickable = GIMP_PICKABLE (drawable);
-    }
-  else
-    {
-      pickable = GIMP_PICKABLE (gimp_image_get_projection (image));
-    }
-
-  gimp_pickable_flush (pickable);
-  
-  if(! options->continuous)
-    {
-	    return gimp_image_contiguous_region_by_seed (image, drawable,
-                                               options->sample_merged,
-                                               sel_options->antialias,
-                                               options->threshold / 255.0,
-                                               options->select_transparent,
-                                               options->select_criterion,
-                                               x, y);
-    }
-  else
-    {
-	    if (gimp_pickable_get_color_at (pickable, x, y, &color))
-            return gimp_image_contiguous_region_by_color (image, drawable,
-                                                    options->sample_merged,
-                                                    sel_options->antialias,
-                                                    options->threshold / 255.0,
-                                                    options->select_transparent,
-                                                    options->select_criterion,
-                                                    &color);
-
-        return NULL;
-    }
-}	
+  gimp_channel_select_ellipse (gimp_image_get_mask (image),
+                               x, y, w, h,
+                               operation,
+                               options->antialias,
+                               options->feather,
+                               options->feather_radius,
+                               options->feather_radius,
+                               TRUE);
+}

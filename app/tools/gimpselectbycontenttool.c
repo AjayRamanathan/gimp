@@ -17,6 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* Need to add content; just made it so that it would be easier later*/
+
+
+
+#if 0
+
 #include "config.h"
 
 #include <string.h>
@@ -149,3 +155,5 @@ gimp_select_by_color_tool_get_mask (GimpRegionSelectTool *region_select,
         return NULL;
     }
 }	
+
+#endif
