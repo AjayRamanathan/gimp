@@ -22,7 +22,7 @@
 #include "gimprectangleselecttool.h"
 
 
-#define GIMP_TYPE_SELECT_BY_SHAPE_TOOL            (gimp_ellipse_select_tool_get_type ())
+#define GIMP_TYPE_SELECT_BY_SHAPE_TOOL            (gimp_select_by_shape_tool_get_type ())
 #define GIMP_SELECT_BY_SHAPE_TOOL(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), GIMP_TYPE_SELECT_BY_SHAPE_TOOL, GimpSelectByShapeTool))
 #define GIMP_SELECT_BY_SHAPE_TOOL_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), GIMP_TYPE_SELECT_BY_SHAPE_TOOL, GimpSelectByShapeToolClass))
 #define GIMP_IS_SELECT_BY_SHAPE_TOOL(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GIMP_TYPE_SELECT_BY_SHAPE_TOOL))
@@ -30,7 +30,7 @@
 #define GIMP_SELECT_BY_SHAPE_TOOL_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), GIMP_TYPE_SELECT_BY_SHAPE_TOOL, GimpSelectByShapeToolClass))
 
 
-typedef struct _GimpSelectByShapeool      GimpSelectByShapeTool;
+typedef struct _GimpSelectByShapeTool      GimpSelectByShapeTool;
 typedef struct _GimpSelectByShapeToolClass GimpSelectByShapeToolClass;
 
 struct _GimpSelectByShapeTool
@@ -47,7 +47,7 @@ struct _GimpSelectByShapeToolClass
 void    gimp_select_by_shape_tool_register (GimpToolRegisterCallback  callback,
                                            gpointer                  data);
 
-GType   gimp_ellipse_select_tool_get_type (void) G_GNUC_CONST;
+GType   gimp_select_by_shape_tool_get_type (void) G_GNUC_CONST;
 
 
 #endif  /*  __GIMP_SELECT_BY_SHAPE_TOOL_H__  */
