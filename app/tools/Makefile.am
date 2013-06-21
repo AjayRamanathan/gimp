@@ -168,6 +168,10 @@ libapptools_a_sources = \
 	gimpseamlessclonetool.h		\
 	gimpselectbycolortool.c		\
 	gimpselectbycolortool.h		\
+    gimpselectbycontenttool.c		\
+	gimpselectbycontenttool.h		\
+    gimpselectbyshapetool.c		\
+	gimpselectbyshapetool.h		\
 	gimpselectionoptions.c		\
 	gimpselectionoptions.h		\
 	gimpselectiontool.c		\

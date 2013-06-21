@@ -80,6 +80,8 @@
 #include "gimprotatetool.h"
 #include "gimpseamlessclonetool.h"
 #include "gimpselectbycolortool.h"
+#include "gimpselectbyshapetool.h"
+#include "gimpselectbycontenttool.h"
 #include "gimpscaletool.h"
 #include "gimpsheartool.h"
 #include "gimpsmudgetool.h"
@@ -187,6 +189,8 @@ gimp_tools_init (Gimp *gimp)
     gimp_fuzzy_select_tool_register,
     gimp_free_select_tool_register,
     gimp_select_by_color_tool_register,
+    gimp_select_by_shape_tool_register,
+    gimp_select_by_content_tool_register
     gimp_ellipse_select_tool_register,
     gimp_rectangle_select_tool_register
   };
