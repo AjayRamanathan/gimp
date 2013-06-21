@@ -42,6 +42,8 @@ struct _GimpRegionSelectOptions
   gdouble               threshold;
   gboolean              continuous;
   GimpSelectCriterion   select_criterion;
+  gboolean              multiple_color;
+  gdouble               brush_size;
 };
 
 
